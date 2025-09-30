@@ -251,8 +251,8 @@ other options are ignored.
 					*pair.dest = &v
 				}
 			}
-
-			r.Pids.Limit = int64(context.Int("pids-limit"))
+			val := int64(context.Int("pids-limit"))
+			r.Pids.Limit = &val
 		}
 
 		// Fix up values
@@ -356,7 +356,7 @@ other options are ignored.
 		if r.Memory.CheckBeforeUpdate != nil {
 			config.Cgroups.Resources.MemoryCheckBeforeUpdate = *r.Memory.CheckBeforeUpdate
 		}
-		config.Cgroups.Resources.PidsLimit = r.Pids.Limit
+		config.Cgroups.Resources.PidsLimit = *r.Pids.Limit
 		config.Cgroups.Resources.Unified = r.Unified
 
 		// Update Intel RDT

@@ -22,6 +22,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 
+	mobyUserNs "github.com/moby/sys/userns"
 	"github.com/opencontainers/cgroups"
 	"github.com/opencontainers/cgroups/fs2"
 	"github.com/opencontainers/runc/libcontainer/configs"
@@ -974,6 +975,26 @@ func (p *initProcess) start() (retErr error) {
 				}
 				if err := hooks.Run(configs.CreateRuntime, s); err != nil {
 					return err
+				}
+			}
+			if mobyUserNs.RunningInUserNS() || p.config.Config.Namespaces.Contains(configs.NEWUSER) {
+				for _, device := range p.config.Config.Devices {
+					if device.HostPath == "" {
+						continue
+					}
+
+					deviceUid := int(device.Uid)
+					deviceGid := int(device.Gid)
+
+					cleaned, err := filepath.Abs(p.config.Config.Rootfs)
+					if err != nil {
+						return err
+					}
+
+					path := fmt.Sprintf("/proc/%d/root%s%s", p.pid(), cleaned, device.Path)
+					if err := os.Chown(path, deviceUid, deviceGid); err != nil {
+						return fmt.Errorf("can not chown mounted device %s: %w", device.Path, err)
+					}
 				}
 			}
 			// Sync with child.

@@ -60,13 +60,12 @@ function teardown() {
 @test "vtpm with mknod command" {
     requires root
     update_config '	.process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
-                    | .linux.devices += [{"path": "'"$VTPM_CONTAINER_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]'
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_CONTAINER_DEVICE"'", "vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432}]'
     runc run tst1
     [ "$status" -eq 0 ]
 
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
-                    | .linux.devices |= map(if .path == "'"$VTPM_CONTAINER_DEVICE"'" then (.path = "'"$VTPM_GENERATED_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms |= map(if .containerPath == "'"$VTPM_CONTAINER_DEVICE"'" then (.containerPath = "'"$VTPM_GENERATED_DEVICE"'" ) else . end)'
     runc run tst2
     [ "$status" -eq 0 ]
 }
@@ -75,8 +74,7 @@ function teardown() {
     requires root
     update_config '	.process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices += [{"path": "'"$VTPM_CONTAINER_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]'
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_CONTAINER_DEVICE"'", "vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]'
     runc run tst1
     [ "$status" -eq 0 ]
 
@@ -86,7 +84,7 @@ function teardown() {
 
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices |= map(if .path == "'"$VTPM_CONTAINER_DEVICE"'" then (.path = "'"$VTPM_GENERATED_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms  |= map(if .containerPath == "'"$VTPM_CONTAINER_DEVICE"'" then (.containerPath = "'"$VTPM_GENERATED_DEVICE"'" ) else . end)'
     runc run tst3
     [ "$status" -eq 0 ]
 
@@ -99,8 +97,7 @@ function teardown() {
     requires root
 
     update_config '	.process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
-                    | .linux.devices += [{"path": "'"$VTPM_GENERATED_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_GENERATED_DEVICE"'", "hostPath": "'"$VTPM_GENERATED_DEVICE"'", "vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432}]
                     | .linux.namespaces += [{"type": "user"}]
                     | .linux.uidMappings += [{"hostID": 100000, "containerID": 0, "size": 65534}]
                     | .linux.gidMappings += [{"hostID": 200000, "containerID": 0, "size": 65534}] '
@@ -110,7 +107,7 @@ function teardown() {
 
     # this can not be run because we have no container path in host
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
-                    | .linux.devices |= map(if .path == "'"$VTPM_GENERATED_DEVICE"'" then (.path = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms |= map(if .containerPath == "'"$VTPM_GENERATED_DEVICE"'" then (.containerPath = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
     runc run tst2
     [ "$status" -eq 0 ]
 }
@@ -120,8 +117,7 @@ function teardown() {
 
     update_config '	.process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices += [{"path": "'"$VTPM_GENERATED_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_GENERATED_DEVICE"'", "hostPath": "'"$VTPM_GENERATED_DEVICE"'", "vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]
                     | .linux.namespaces += [{"type": "user"}]
                     | .linux.uidMappings += [{"hostID": 100000, "containerID": 0, "size": 65534}]
                     | .linux.gidMappings += [{"hostID": 200000, "containerID": 0, "size": 65534}] '
@@ -137,7 +133,7 @@ function teardown() {
     # this can not be run because we have no container path in host
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices |= map(if .path == "'"$VTPM_GENERATED_DEVICE"'" then (.path = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms |= map(if .containerPath == "'"$VTPM_GENERATED_DEVICE"'" then (.containerPath = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
     runc run tst3
     [ "$status" -eq 0 ]
 
@@ -163,8 +159,7 @@ function teardown() {
 	echo "$userns_path" >>"$to_umount_list"
 
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
-                    | .linux.devices += [{"path": "'"$VTPM_GENERATED_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_GENERATED_DEVICE"'", "hostPath": "'"$VTPM_GENERATED_DEVICE"'", "vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432}]
                     | .linux.namespaces |= map(if .type == "user" then (.path = "'"$userns_path"'") else . end)
 		            | del(.linux.uidMappings)
 		            | del(.linux.gidMappings)'
@@ -174,7 +169,7 @@ function teardown() {
 
     # this can not be run because we have no container path in host
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
-                    | .linux.devices |= map(if .path == "'"$VTPM_GENERATED_DEVICE"'" then (.path = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms |= map(if .containerPath == "'"$VTPM_GENERATED_DEVICE"'" then (.containerPath = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
     runc run in_userns_2
 	[ "$status" -eq 0 ]
 }
@@ -196,8 +191,7 @@ function teardown() {
 
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_GENERATED_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices += [{"path": "'"$VTPM_GENERATED_DEVICE"'", "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]
-                    | .linux.resources.devices += [{"allow": true, "type": "c", "major": '"$test_major"', "minor": '"$test_minor"', "access": "rwm"}]
+                    | .linux.resources.vtpms = [{"containerPath": "'"$VTPM_GENERATED_DEVICE"'", "hostPath": "'"$VTPM_GENERATED_DEVICE"'","vtpmMajor": '"$test_major"', "vtpmMinor": '"$test_minor"', "fileMode": 432, "uid": 103, "gid": 104}]
                     | .linux.namespaces |= map(if .type == "user" then (.path = "'"$userns_path"'") else . end)
 		            | del(.linux.uidMappings)
 		            | del(.linux.gidMappings)'
@@ -213,7 +207,7 @@ function teardown() {
     # this can not be run because we have no container path in host
     update_config ' .process.args = ["/bin/'"$HELPER"'", "'"$VTPM_CONTAINER_DEVICE_PATH_ARG"'"]
                     | .process.user = {"uid" : 103, "gid": 104}
-                    | .linux.devices |= map(if .path == "'"$VTPM_GENERATED_DEVICE"'" then (.path = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
+                    | .linux.resources.vtpms |= map(if .containerPath == "'"$VTPM_GENERATED_DEVICE"'" then (.containerPath = "'"$VTPM_CONTAINER_DEVICE"'" ) else . end)'
     runc run in_userns_3
 	[ "$status" -eq 0 ]
 

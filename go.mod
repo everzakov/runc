@@ -33,3 +33,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 )
+
+replace github.com/opencontainers/runtime-spec => github.com/everzakov/runtime-spec v0.0.0-20251003131805-c841638d9095
+
+replace github.com/opencontainers/cgroups => github.com/everzakov/cgroups v0.0.0-20251003131448-5353aa257b68

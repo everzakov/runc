@@ -434,7 +434,7 @@ type LinuxCPU struct {
 // LinuxPids for Linux cgroup 'pids' resource management (Linux 4.3)
 type LinuxPids struct {
 	// Maximum number of PIDs. Default is "no limit".
-	Limit int64 `json:"limit"`
+	Limit *int64 `json:"limit,omitempty"`
 }
 
 // LinuxNetwork identification and priority configuration
@@ -451,6 +451,22 @@ type LinuxRdma struct {
 	HcaHandles *uint32 `json:"hcaHandles,omitempty"`
 	// Maximum number of HCA objects that can be created. Default is "no limit".
 	HcaObjects *uint32 `json:"hcaObjects,omitempty"`
+}
+
+// LinuxVTPM for vTPM definition
+type LinuxVTPM struct {
+	// Path to the device in the host
+	HostPath string `json:"hostPath,omitempty"`
+	// Path to the device in the container
+	ContainerPath string `json:"containerPath,omitempty"`
+	// Device's major to be created
+	VTPMMajor int64 `json:"vtpmMajor,omitempty"`
+	// Device's minor to be created
+	VTPMMinor int64 `json:"vtpmMinor,omitempty"`
+	// UID of the vtpm device.
+	UID uint32 `json:"uid,omitempty"`
+	// Gid of the vtpm device.
+	GID uint32 `json:"gid,omitempty"`
 }
 
 // LinuxResources has container runtime resource constraints
@@ -475,6 +491,8 @@ type LinuxResources struct {
 	Rdma map[string]LinuxRdma `json:"rdma,omitempty"`
 	// Unified resources.
 	Unified map[string]string `json:"unified,omitempty"`
+	// Linux VTPM configuration
+	VTPMs []LinuxVTPM `json:"vtpms,omitempty"`
 }
 
 // LinuxDevice represents the mknod information for a Linux special device file

@@ -16,6 +16,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
+github.com/everzakov/cgroups v0.0.0-20251003131448-5353aa257b68 h1:lKI02VaOoUPTpvxjvawJVy+oT8is+YSQ1Exz7UdtCsk=
+github.com/everzakov/cgroups v0.0.0-20251003131448-5353aa257b68/go.mod h1:oWVzJsKK0gG9SCRBfTpnn16WcGEqDI8PAcpMGbqWxcs=
+github.com/everzakov/runtime-spec v0.0.0-20251003131805-c841638d9095 h1:aeq29nVldZ3YAagQMpR6yhxMi38AB2yptFdqzp+yL8w=
+github.com/everzakov/runtime-spec v0.0.0-20251003131805-c841638d9095/go.mod h1:Kbvgc27P6fS+ifaBC6lxYMD2hmLwpmWT4+fJCvyJvRg=
 github.com/go-quicktest/qt v1.101.0 h1:O1K29Txy5P2OK0dGo59b7b0LR6wKfIhttaAhHUyn7eI=
 github.com/go-quicktest/qt v1.101.0/go.mod h1:14Bz/f7NwaXPtdYEgzsx46kqSxVwTbzVZsDC26tQJow=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
@@ -48,10 +52,6 @@ github.com/moby/sys/userns v0.1.0 h1:tVLXkFOxVu9A64/yh59slHVv9ahO9UIev4JZusOLG/g
 github.com/moby/sys/userns v0.1.0/go.mod h1:IHUYgu/kao6N8YZlp9Cf444ySSvCmDlmzUcYfDHOl28=
 github.com/mrunalp/fileutils v0.5.1 h1:F+S7ZlNKnrwHfSwdlgNSkKo67ReVf8o9fel6C3dkm/Q=
 github.com/mrunalp/fileutils v0.5.1/go.mod h1:M1WthSahJixYnrXQl/DFQuteStB1weuxD2QJNHXfbSQ=
-github.com/opencontainers/cgroups v0.0.5 h1:DRITAqcOnY0uSBzIpt1RYWLjh5DPDiqUs4fY6Y0ktls=
-github.com/opencontainers/cgroups v0.0.5/go.mod h1:oWVzJsKK0gG9SCRBfTpnn16WcGEqDI8PAcpMGbqWxcs=
-github.com/opencontainers/runtime-spec v1.2.2-0.20250818071321-383cadbf08c0 h1:RLn0YfUWkiqPGtgUANvJrcjIkCHGRl3jcz/c557M28M=
-github.com/opencontainers/runtime-spec v1.2.2-0.20250818071321-383cadbf08c0/go.mod h1:jwyrGlmzljRJv/Fgzds9SsS/C5hL+LL3ko9hs6T5lQ0=
 github.com/opencontainers/selinux v1.12.0 h1:6n5JV4Cf+4y0KNXW48TLj5DwfXpvWlxXplUkdTrmPb8=
 github.com/opencontainers/selinux v1.12.0/go.mod h1:BTPX+bjVbWGXw7ZZWUbdENt8w0htPSrlgOOysQaU62U=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

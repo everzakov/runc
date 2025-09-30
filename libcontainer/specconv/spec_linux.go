@@ -858,7 +858,7 @@ func CreateCgroupConfig(opts *CreateOpts, defaultDevs []*devices.Device) (*cgrou
 				c.Resources.CPUIdle = r.CPU.Idle
 			}
 			if r.Pids != nil {
-				c.Resources.PidsLimit = r.Pids.Limit
+				c.Resources.PidsLimit = *r.Pids.Limit
 			}
 			if r.BlockIO != nil {
 				if r.BlockIO.Weight != nil {
@@ -964,13 +964,46 @@ func stringToDeviceRune(s string) (devices.Type, error) {
 	}
 }
 
+func getVTPMDevices(spec *specs.Spec, config *configs.Config) []*devices.Device {
+	if spec == nil || spec.Linux == nil || spec.Linux.Resources == nil {
+		return nil
+	}
+
+	var vtpmDevices []*devices.Device
+
+	for _, vtpm := range spec.Linux.Resources.VTPMs {
+		var filemode os.FileMode = 0o660
+
+		device := &devices.Device{
+			Rule: devices.Rule{
+				Type:  devices.CharDevice,
+				Major: vtpm.VTPMMajor,
+				Minor: vtpm.VTPMMinor,
+
+				Permissions: "rwm",
+				Allow:       true,
+			},
+			Path:     vtpm.ContainerPath,
+			HostPath: vtpm.HostPath,
+			FileMode: filemode,
+			Uid:      vtpm.UID,
+			Gid:      vtpm.GID,
+		}
+		vtpmDevices = append(vtpmDevices, device)
+	}
+	return vtpmDevices
+}
+
 func createDevices(spec *specs.Spec, config *configs.Config) ([]*devices.Device, error) {
 	// If a spec device is redundant with a default device, remove that default
 	// device (the spec one takes priority).
 	dedupedAllowDevs := []*devices.Device{}
 
+	allocatedDevices := getVTPMDevices(spec, config)
+	allocatedDevices = append(allocatedDevices, AllowedDevices...)
+
 next:
-	for _, ad := range AllowedDevices {
+	for _, ad := range allocatedDevices {
 		if ad.Path != "" && spec.Linux != nil {
 			for _, sd := range spec.Linux.Devices {
 				if sd.Path == ad.Path {
@@ -1060,17 +1093,25 @@ func setupUserNamespace(spec *specs.Spec, config *configs.Config) error {
 			"gid_map": gidMap,
 		}).Debugf("config uses path-based userns configuration -- current uid and gid mappings cached")
 	}
-	rootUID, err := config.HostRootUID()
-	if err != nil {
-		return err
-	}
-	rootGID, err := config.HostRootGID()
-	if err != nil {
-		return err
-	}
+	// rootUID, err := config.HostRootUID()
+	// if err != nil {
+	// 	return err
+	// }
+	// rootGID, err := config.HostRootGID()
+	// if err != nil {
+	// 	return err
+	// }
 	for _, node := range config.Devices {
-		node.Uid = uint32(rootUID)
-		node.Gid = uint32(rootGID)
+		namespaceUID, err := config.HostUID(int(node.Uid))
+		if err != nil {
+			return err
+		}
+		namespaceGID, err := config.HostGID(int(node.Gid))
+		if err != nil {
+			return err
+		}
+		node.Uid = uint32(namespaceUID)
+		node.Gid = uint32(namespaceGID)
 	}
 	return nil
 }

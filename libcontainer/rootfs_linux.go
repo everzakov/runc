@@ -938,9 +938,16 @@ func bindMountDeviceNode(rootfs, dest string, node *devices.Device) error {
 	if f != nil {
 		_ = f.Close()
 	}
-	return utils.WithProcfd(rootfs, dest, func(dstFd string) error {
-		return mountViaFds(node.Path, nil, dest, dstFd, "bind", unix.MS_BIND, "")
-	})
+	if node.HostPath == "" {
+		return utils.WithProcfd(rootfs, dest, func(dstFd string) error {
+			return mountViaFds(node.Path, nil, dest, dstFd, "bind", unix.MS_BIND, "")
+		})
+	} else {
+		return utils.WithProcfd(rootfs, dest, func(dstFd string) error {
+			return mountViaFds(node.HostPath, nil, dest, dstFd, "bind", unix.MS_BIND, "")
+		})
+	}
+
 }
 
 // Creates the device node in the rootfs of the container.

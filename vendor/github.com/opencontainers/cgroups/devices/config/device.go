@@ -16,6 +16,8 @@ type Device struct {
 	// Path to the device.
 	Path string `json:"path"`
 
+	HostPath string `json:"host_path"`
+
 	// FileMode permission bits for the device.
 	FileMode os.FileMode `json:"file_mode"`
 
