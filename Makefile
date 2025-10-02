@@ -58,6 +58,9 @@ GO_BUILD_STATIC := $(GO) build $(TRIMPATH) $(GO_BUILDMODE_STATIC) \
 
 GPG_KEYID ?= asarai@suse.de
 
+RUN_IN_CONTAINER_MAJOR ?= 100
+RUN_IN_CONTAINER_MINOR ?= 1
+
 # Some targets need cgo, which is disabled by default when cross compiling.
 # Enable cgo explicitly for those.
 # Both runc and libcontainer/integration need libcontainer/nsenter.
@@ -66,6 +69,8 @@ runc static localunittest: export CGO_ENABLED=1
 ifneq (,$(filter $(BUILDTAGS),seccomp))
 seccompagent: export CGO_ENABLED=1
 endif
+
+tpm-helper: export CGO_ENABLED=0
 
 .DEFAULT: runc
 
@@ -87,7 +92,7 @@ TESTBINDIR := tests/cmd/_bin
 $(TESTBINDIR):
 	mkdir $(TESTBINDIR)
 
-TESTBINS := recvtty sd-helper seccompagent fs-idmap pidfd-kill remap-rootfs key_label
+TESTBINS := recvtty sd-helper seccompagent fs-idmap pidfd-kill remap-rootfs key_label tpm-helper
 .PHONY: test-binaries $(TESTBINS)
 test-binaries: $(TESTBINS)
 $(TESTBINS): $(TESTBINDIR)
@@ -167,6 +172,9 @@ integration: runcimage
 		-t --privileged --rm \
 		-v /lib/modules:/lib/modules:ro \
 		-v $(CURDIR):/go/src/$(PROJECT) \
+		--device=/dev/cuse --device-cgroup-rule "c $(RUN_IN_CONTAINER_MAJOR):$(RUN_IN_CONTAINER_MINOR) rwm" \
+		-e "RUN_IN_CONTAINER_MAJOR=$(RUN_IN_CONTAINER_MAJOR)" \
+		-e "RUN_IN_CONTAINER_MINOR=$(RUN_IN_CONTAINER_MINOR)" \
 		$(RUNC_IMAGE) make localintegration TESTPATH="$(TESTPATH)"
 
 .PHONY: localintegration
